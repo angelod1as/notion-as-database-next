@@ -1,3 +1,9 @@
+# Notion as Database - NextJS
+
+This repository contains the code of this tutorial, teaching how to use Notion as a simple database.
+
+## NextJS
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
