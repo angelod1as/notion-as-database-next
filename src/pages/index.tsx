@@ -1,11 +1,55 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import styles from '@/styles/Home.module.css'
+import Head from "next/head";
+import styles from "@/styles/Home.module.css";
+import React, { FormEvent, useState } from "react";
 
-const inter = Inter({ subsets: ['latin'] })
+type FormData = {
+  "first-name": string;
+  "last-name": string;
+  "food-limitation": string;
+  "plus-one": string;
+  "money-gift": string;
+};
 
 export default function Home() {
+  const [values, setValues] = useState<FormData>({
+    "first-name": "",
+    "food-limitation": "omnivorous",
+    "last-name": "",
+    "plus-one": "false",
+    "money-gift": "0",
+  });
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      const response = await fetch("/api/notion", {
+        body: JSON.stringify(values),
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        return alert(`
+        There was an error with your form submission:
+        Status: ${response.status} - ${response.statusText}
+        `);
+      }
+
+      return alert("Submission succesful");
+    } catch (error) {
+      return alert(`
+      There was an error with your form submission:
+      ${error}
+      `);
+    }
+  };
+
+  const updateValue = (field: keyof FormData, value: string | boolean) => {
+    setValues((values) => ({
+      ...values,
+      [field]: value.toString(),
+    }));
+  };
+
   return (
     <>
       <Head>
@@ -14,110 +58,78 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>src/pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
+      <main>
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <div className={styles.wrapper}>
+            <label htmlFor="first-name">First name</label>
+            <input
+              type="text"
+              name="first-name"
+              id="first-name"
+              className={styles.mb}
+              onChange={(e) => updateValue("first-name", e.target.value)}
+              value={values["first-name"]}
             />
           </div>
-        </div>
 
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
+          <div className={styles.wrapper}>
+            <label htmlFor="last-name">Last name</label>
+            <input
+              type="text"
+              name="last-name"
+              id="last-name"
+              className={styles.mb}
+              onChange={(e) => updateValue("last-name", e.target.value)}
+              value={values["last-name"]}
+            />
+          </div>
 
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
+          <div className={styles.wrapper}>
+            <label htmlFor="food-limitation">
+              What kind of food can you eat?
+            </label>
+            <select
+              name="food-limitation"
+              id="food-limitation"
+              className={styles.mb}
+              onChange={(e) => updateValue("food-limitation", e.target.value)}
+              value={values["food-limitation"]}
+            >
+              <option value="omnivorous">I eat anything</option>
+              <option value="vegetarian">{"I'm vegetarian"}</option>
+              <option value="vegan">{"I'm vegan"}</option>
+            </select>
+          </div>
 
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
+          <div className={styles.inline}>
+            <input
+              type="checkbox"
+              name="plus-one"
+              id="plus-one"
+              onChange={(e) => updateValue("plus-one", e.target.checked)}
+              value={values["plus-one"]}
+            />
+            <label htmlFor="plus-one">I will bring a +1</label>
+          </div>
 
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
+          <div className={styles.wrapper}>
+            <label htmlFor="money-gift">How much money will you gift me?</label>
+            <input
+              type="number"
+              name="money-gift"
+              id="money-gift"
+              min="0"
+              className={styles.mb}
+              onChange={(e) => updateValue("money-gift", e.target.value)}
+              value={values["money-gift"]}
+            />
+          </div>
+
+          <div className={styles.wrapper}>
+            <input type="submit" value="Submit" />
+          </div>
+        </form>
       </main>
     </>
-  )
+  );
 }
